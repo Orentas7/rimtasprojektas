@@ -135,6 +135,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setAuthUser", window.auth_user);
     this.loadCampaignStatuses();
     this.loadGiftItems();
   },

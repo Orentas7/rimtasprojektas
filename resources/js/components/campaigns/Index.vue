@@ -58,6 +58,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setAuthUser", window.auth_user);
     this.loadGiftCampaigns();
   },
   methods: {

@@ -8,6 +8,7 @@
             v-model="giftItem.name"
             label="Item Name"
             required
+            readonly
           ></v-text-field>
           <v-alert text type="error" v-if="errors && errors.name">{{
             errors.name[0]
@@ -16,13 +17,14 @@
             v-model="giftItem.unit_price"
             label="Unit Price"
             required
+            readonly
           ></v-text-field>
           <v-alert text type="error" v-if="errors && errors.unit_price">{{
             errors.unit_price[0]
           }}</v-alert>
           <v-text-field
             v-model="giftItem.unit_owned"
-            label="Unit's Owned"
+            label="Add To Unit's Owned"
             required
           ></v-text-field>
           <v-alert text type="error" v-if="errors && errors.unit_owned">{{
@@ -45,6 +47,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setAuthUser", window.auth_user);
     this.loadGiftItem(this.$route.params.id);
   },
   methods: {
@@ -53,6 +56,8 @@ export default {
         .get(`/giftbox/public/api/gift-items/${giftItemId}`)
         .then((response) => {
           this.giftItem = response.data;
+          this.giftItem.unit_price = this.giftItem.unit_price / 100;
+          this.giftItem.unit_owned = "";
           this.loading = false;
         })
         .catch((error) => {
@@ -60,13 +65,14 @@ export default {
         });
     },
     updateGiftItem() {
+      this.giftItem.unit_price = this.giftItem.unit_price * 100;
       axios
         .patch(
           `/giftbox/public/api/gift-items/${this.$route.params.id}`,
           this.giftItem
         )
         .then((respone) => {
-          this.loadGiftItem(this.$route.params.id);
+          this.$router.go(-1);
         })
         .catch((error) => {
           if (error.response.status == 422) {

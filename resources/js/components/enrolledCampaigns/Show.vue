@@ -35,7 +35,7 @@
       <v-form @submit.prevent="submit()">
         <v-sheet rounded outlined class="mb-2 p-2">
           <v-list-item-title>
-            {{ user.name | capitalize }}
+            {{ this.$store.getters.user.name | capitalize }}
           </v-list-item-title>
           <v-textarea
             v-model="fields.body"
@@ -66,13 +66,12 @@ export default {
       giftItems: [],
       item_carts: [],
       giftItemUsed: "",
-      user: "",
     };
   },
   mounted() {
+    this.$store.commit("setAuthUser", window.auth_user);
     this.loadGiftCampaigns(this.$route.params.id);
     this.loadCampaignStatuses();
-    this.loadUser();
   },
   methods: {
     loadGiftCampaigns: function (campaignId) {
@@ -89,19 +88,10 @@ export default {
     loadCampaignStatuses: function () {
       axios.get("/giftbox/public/api/campaign-statuses").then((response) => {
         this.campaignStatuses = response.data.data;
+        this.loading = false;
       });
     },
-    loadUser: function () {
-      axios
-        .get("/giftbox/public/api/user")
-        .then((response) => {
-          this.user = response.data;
-          this.loading = false;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    },
+
     submit() {
       axios
         .post("/giftbox/public/api/comments", this.fields)
@@ -109,7 +99,6 @@ export default {
           this.fields = {};
           this.loadGiftCampaigns(this.$route.params.id);
           this.loadCampaignStatuses();
-          this.loadUser();
         })
         .catch((error) => {
           if (error.response.status == 422) {

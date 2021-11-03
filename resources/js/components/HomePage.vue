@@ -17,29 +17,21 @@
             <td>{{ giftCampaign.campaign_status.status }}</td>
             <td>{{ giftCampaign.dispatch_date }}</td>
             <td>{{ giftCampaign.delivery_date }}</td>
-            <td
-              v-for="subscriber in giftCampaign.subscribers"
-              :key="subscriber.id"
-            >
+            <td>
               <v-btn
                 @click="unsubscribe(giftCampaign.id)"
-                v-if="user.id == subscriber.id"
+                v-if="subscribed(user.id, giftCampaign.subscribers)"
                 text
                 color="error"
               >
                 Unsubscribe
               </v-btn>
               <v-btn
-                @click="subscribe(giftCampaign)"
                 v-else
+                @click="subscribe(giftCampaign)"
                 text
                 color="primary"
               >
-                Subscribe
-              </v-btn>
-            </td>
-            <td v-if="giftCampaign.subscribers.length < 1">
-              <v-btn @click="subscribe(giftCampaign)" text color="primary">
                 Subscribe
               </v-btn>
             </td>
@@ -68,21 +60,22 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
 export default {
   data: function () {
     return {
       giftCampaign: "",
       giftCampaigns: [],
       loading: true,
-      user: "",
       snackbar: false,
       snackbar1: false,
     };
   },
   mounted() {
+    this.$store.commit("setAuthUser", window.auth_user);
     this.loadGiftCampaigns();
-    this.loadUser();
   },
+  computed: mapGetters(["user"]),
   methods: {
     loadGiftCampaigns: function () {
       axios
@@ -96,7 +89,7 @@ export default {
         });
     },
     subscribe(giftCampaign) {
-      if (this.user === "") {
+      if (!this.$store.getters.isLoggedIn) {
         this.snackbar = true;
       } else {
         axios
@@ -123,15 +116,18 @@ export default {
           }
         });
     },
-    loadUser: function () {
-      axios
-        .get("/giftbox/public/api/user")
-        .then((response) => {
-          this.user = response.data;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
+    subscribed(userId, subscribers) {
+      let flag = null;
+      subscribers.forEach((subscriber) => {
+        if (userId == subscriber.id) {
+          flag = 1;
+        }
+      });
+      if (flag === 1) {
+        return true;
+      } else if (typeof flag === "undefined") {
+        return false;
+      }
     },
   },
 };

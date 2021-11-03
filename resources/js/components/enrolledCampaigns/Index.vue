@@ -39,11 +39,11 @@ export default {
   data: function () {
     return {
       giftCampaigns: [],
-      loading: false,
+      loading: true,
     };
   },
   mounted() {
-    this.loadUser();
+    this.$store.commit("setAuthUser", window.auth_user);
     this.loadGiftCampaigns();
   },
   methods: {
@@ -57,12 +57,6 @@ export default {
         .catch((error) => {
           console.log(error);
         });
-    },
-    loadUser: function () {
-      axios
-        .get("/giftbox/public/api/user")
-        .then((response) => {})
-        .catch((error) => {});
     },
   },
 };

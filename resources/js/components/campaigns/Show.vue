@@ -158,6 +158,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setAuthUser", window.auth_user);
     this.loadGiftCampaigns(this.$route.params.id);
     this.loadCampaignStatuses();
     this.loadGiftItems();
@@ -169,7 +170,6 @@ export default {
         .then((response) => {
           this.fields = response.data.giftCampaign;
           this.fields.item_carts = response.data.giftItems;
-          // this.comments = response.data.giftCampaign.comments;
           this.loading = false;
         })
         .catch((error) => {
@@ -190,7 +190,7 @@ export default {
       axios
         .patch(`/giftbox/public/api/campaigns/${campaignId}`, this.fields)
         .then((respone) => {
-          this.loadGiftCampaigns(this.$route.params.id);
+          this.$router.go(-1);
         })
         .catch((error) => {
           if (error.response.status == 422) {

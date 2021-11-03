@@ -52,6 +52,7 @@ export default {
     };
   },
   mounted() {
+    this.$store.commit("setAuthUser", window.auth_user);
     this.loadGiftItems();
   },
   methods: {
@@ -70,7 +71,7 @@ export default {
       axios
         .delete(`/giftbox/public/api/gift-items/${id}`)
         .then((response) => {
-          console.log(response);
+          this.loadGiftItems();
         })
         .catch((error) => {
           console.log(error);

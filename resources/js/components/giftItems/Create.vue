@@ -43,8 +43,12 @@ export default {
       errors: {},
     };
   },
+  mounted() {
+    this.$store.commit("setAuthUser", window.auth_user);
+  },
   methods: {
     submit() {
+      this.fields.unit_price = this.fields.unit_price * 100;
       axios
         .post("/giftbox/public/api/gift-items", this.fields)
         .then((respone) => {
